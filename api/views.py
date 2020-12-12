@@ -16,7 +16,7 @@ class PersonaAPI(APIView):
         #personas = [Persona.nombre for persona in Persona.objects.all()]
         personas = Persona.objects.all()
         serializer = PersonaSerializer(personas, many = True)
-        return Response({"data":serializer.data})
+        return Response(serializer.data)
 
     def post(self,request):
         serializer = PersonaSerializer(data=request.data)
