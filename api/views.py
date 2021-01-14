@@ -9,6 +9,8 @@ from .models import Persona, Salones
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework import filters
+from django.views.decorators.csrf import csrf_exempt
+
 # Create your views here.
 
 class PersonaAPI(APIView):
@@ -27,14 +29,16 @@ class PersonaAPI(APIView):
             return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 
-class PersonaDetail(ListView):
+class PersonaDetail(APIView):
+    """
+    No jalaba porque le tenía puesto ListView pero no recuerdo porqué
+    """
 
     def get(self, request, persona_id):
         persona = Persona.objects.get(id=persona_id)
         serializer = PersonaSerializer(persona)
         return Response(serializer.data)
-
-
+   
     def put(self, request, persona_id):
         print(persona_id)
         persona = Persona.objects.get(id=persona_id)
@@ -46,17 +50,18 @@ class PersonaDetail(ListView):
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     def delete(self, request, persona_id):
         persona = Persona.objects.get(id=persona_id)
         persona.delete()
         return Response({"message" :" Persona eliminada"}, status=status.HTTP_200_OK)
-
+    
 class Extra(APIView):
     def get(self, request, persona_nombre):
         persona = Persona.objects.get(nombre=persona_nombre)
         serializer = PersonaSerializer(persona, many = True)
         return Response({"data":serializer.data})
+
 
 class PersonaListView(ListAPIView):
     filter_backends = [DjangoFilterBackend]
@@ -64,7 +69,7 @@ class PersonaListView(ListAPIView):
     serializer_class = PersonaSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['nombre']
-    """
+    
     def put(self, request, persona_id):
         personaGuardada = get_object_or_404(Persona.objects.all(), pk=pk)
         data = request.data.get('Persona')
@@ -95,7 +100,7 @@ class PersonaListView(ListAPIView):
             persona.delete()
             return Response({"message" :" Persona eliminada"}, status=status.HTTP_200_OK)
    
-    """
+    
 class SalonesAPI(APIView):
 
     def get(self, request, format=None):
@@ -135,4 +140,3 @@ class SalonesDetail(APIView):
         salon = Salones.objects.get(id=salon_id)
         salon.delete()
         return Response({"message" :" salon eliminado"}, status=status.HTTP_200_OK)
-    
